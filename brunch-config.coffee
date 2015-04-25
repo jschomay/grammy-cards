@@ -8,4 +8,4 @@ exports.config =
       joinTo:
         'scripts/game.js': /^src/
         'scripts/vendor.js': /^vendor/
-  sourceMaps: false
+  sourceMaps: true

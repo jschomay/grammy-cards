@@ -1,1 +1,4 @@
-console.log "game script"
+cards = require "./cards"
+
+deck = cards.getDeck()
+console.log deck
