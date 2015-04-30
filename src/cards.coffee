@@ -21,7 +21,7 @@ buildCard = R.map (cardType) ->
   image: cardType
   status: CARD_STATES.HIDDEN
 
-makePair = R.chain (item) -> [item, item]
+makePair = R.chain (item) -> [item, R.clone item]
 buildDeck = R.compose(makePair, buildCard)
 
 randomOrderComparator = -> Math.floor(Math.random() * 3) - 1
