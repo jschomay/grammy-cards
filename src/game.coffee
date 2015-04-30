@@ -20,6 +20,9 @@ m = matched
 
 Stream rules / definitions:
 
+Flip stream:
+- you can't flip the same card twice in a row if the round hasn't changed
+
 Match stream:
 - buffer card status until round end (every 2 flips)
 - do the images match?
@@ -29,10 +32,11 @@ Update cards stream:
 
 Card value:
 - start face down
-- respond to matching card click stream once, turning face up
+- respond to matching flip stream once, turning face up
 - after turning face up, respond to update cards stream - go face down if false, matched if true
 - after turning face down, listen to matching card click stream again
 - only respond do clicks when play is active (between "update cards" and "match" events)
+
 
 Side effects from each card value stream:
 - on a card going face up, render card's image
@@ -45,11 +49,8 @@ drawing = require "./drawing"
 
 deck = cards.getDeck()
 
-buildCardStreams = R.mapIndexed ($card, i) ->
-  # add ref to view for easy updating
-  card = R.merge deck[i], {view: $card}
-  Kefir.fromEvents($card, "click", R.always card)
-
+makeClickStreams = R.mapIndexed ($card, i) ->
+  Kefir.fromEvents($card, "click", R.always deck[i])
 
 isEven = (n) -> n % 2
 
@@ -57,22 +58,43 @@ isEven = (n) -> n % 2
 # on document ready
 Zepto ->
   $cards = drawing.renderDeck deck
-  flipStream = Kefir.merge(buildCardStreams $cards)
+  cardClicks = makeClickStreams $cards
 
-  flipCountStream = flipStream.scan(R.add(1), 0)
+  validFlip = Kefir.merge(cardClicks)
+    .scan (acc, event) ->
+      if acc.faceUps.length is 2
+        # first flip (always valid)
+        {faceUps: [event], valid: true}
+      else
+        # second flip (must be a different card)
+        if R.contains event, acc.faceUps
+          R.merge acc, {valid: false}
+        else
+          faceUps = R.append event, acc.faceUps
+          {faceUps: faceUps, valid: true}
+    , {faceUps: [], valid: false}
+    .map R.prop "valid"
 
-  firstCardStream = flipStream.filterBy(flipCountStream.map(isEven))
-  secondCardStream = flipStream.filterBy(flipCountStream.map(R.compose(R.not, isEven)))
+  # stores valid first and second flips
+  faceUps = Kefir.merge(cardClicks)
+    .filterBy validFlip
+    .scan (faceUps, event) ->
+      if faceUps.length is 2
+        [event]
+      else
+        R.append event, faceUps
+    , []
 
-  pairsStream = Kefir.zip([firstCardStream, secondCardStream])
-
-  matchStream = pairsStream.map(R.apply(R.eqProps("image")))
-
-  roundCountStream = firstCardStream.scan(R.add(1), 0)
-
-  roundCountStream.skip(1).log("Round:")
-  firstCardStream.map(R.prop("image")).log("First card:")
-  secondCardStream.map(R.prop("image")).log("Second card:")
-  matchStream.log("IsMatch?:")
+  getCardStream = (i) ->
+    cardClicks[i]
+      .take(1)
+      .flatMap(-> rounds.take(2).flatMapLatest(-> getCardStream i).toProperty(->"asdfas"))
+      .toProperty(->'test')
 
 
+  card1Stream = getCardStream 0
+  card2Stream = getCardStream 1
+  card3Stream = getCardStream 2
+
+
+  faceUps.map(R.map R.prop "image").log("face up:")
