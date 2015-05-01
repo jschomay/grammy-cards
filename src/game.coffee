@@ -85,6 +85,10 @@ Zepto ->
         R.append event, faceUps
     , []
 
+  match = faceUps
+    .filter R.compose R.eq(2), R.length
+    .map R.apply(R.eqProps("image"))
+
   getCardStream = (i) ->
     cardClicks[i]
       .take(1)
@@ -98,3 +102,4 @@ Zepto ->
 
 
   faceUps.map(R.map R.prop "image").log("face up:")
+  match.log("match?")
