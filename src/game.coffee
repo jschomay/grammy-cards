@@ -89,17 +89,17 @@ Zepto ->
     .filter R.compose R.eq(2), R.length
     .map R.apply(R.eqProps("image"))
 
-  getCardStream = (i) ->
-    cardClicks[i]
-      .take(1)
-      .flatMap(-> rounds.take(2).flatMapLatest(-> getCardStream i).toProperty(->"asdfas"))
-      .toProperty(->'test')
+  getCardStream = (card) ->
+    # each card model should respond to its corresponding view
+    faceUps
+      .filter R.contains card
+      .scan (card, event) ->
+        R.merge card, {status: 1}
+      , card
 
 
-  card1Stream = getCardStream 0
-  card2Stream = getCardStream 1
-  card3Stream = getCardStream 2
+  cards = Kefir.merge R.map getCardStream, deck
 
 
-  faceUps.map(R.map R.prop "image").log("face up:")
+  cards.map(R.values).log("Render")
   match.log("match?")
