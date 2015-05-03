@@ -51,9 +51,11 @@ deck = cards.getDeck()
 
 # takes object id: $card
 # returns array of click streams for each $card
-# (each click passes the value of its associated card)
-makeClickStreams = R.pipe R.values, R.mapIndexed ($card, i) ->
-  Kefir.fromEvents($card, "click", R.always deck[i])
+# (each click passes the id of its associated card)
+makeClickStreams = R.pipe R.toPairs, R.map (elem) ->
+  id = elem[0]
+  $card = elem[1]
+  Kefir.fromEvents($card, "click", R.always id)
 
 
 # on document ready
@@ -88,12 +90,16 @@ Zepto ->
 
   match = faceUps
     .filter R.compose R.eq(2), R.length
-    .map R.apply(R.eqProps("image"))
+    .map (pair) ->
+      # ids are the card type followed by a 1 or 2, so we can
+      # find a match by comparing just the card type portion
+      ignoreDigits = (string) -> string.replace(/\d/, "")
+      R.compose(R.apply(R.eq), R.map(ignoreDigits)) pair
 
   getCardStream = (card) ->
     # each card model should respond to its corresponding view
     faceUps
-      .filter R.contains card
+      .filter R.contains card.id
       .scan (card, event) ->
         R.merge card, {status: 1}
       , card
