@@ -17,12 +17,14 @@ availableCards = [
 cardFilter = -> R.T
 getCardSet = -> R.filter cardFilter, availableCards
 
-buildCard = R.map (cardType) ->
+# assumes pairs will be ordered together
+buildCard = R.mapIndexed (cardType, i) ->
+  id: cardType + (1 + i % 2) # eg. eating1 / eating2
   image: cardType
   status: CARD_STATES.HIDDEN
 
-makePair = R.chain (item) -> [item, R.clone item]
-buildDeck = R.compose(makePair, buildCard)
+makePairs = R.chain (cardType) -> [cardType, cardType]
+buildDeck = R.compose(buildCard, makePairs)
 
 randomOrderComparator = -> Math.floor(Math.random() * 3) - 1
 shuffleDeck = R.sort randomOrderComparator

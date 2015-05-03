@@ -49,10 +49,11 @@ drawing = require "./drawing"
 
 deck = cards.getDeck()
 
-makeClickStreams = R.mapIndexed ($card, i) ->
+# takes object id: $card
+# returns array of click streams for each $card
+# (each click passes the value of its associated card)
+makeClickStreams = R.pipe R.values, R.mapIndexed ($card, i) ->
   Kefir.fromEvents($card, "click", R.always deck[i])
-
-isEven = (n) -> n % 2
 
 
 # on document ready
@@ -103,3 +104,6 @@ Zepto ->
 
   cards.map(R.values).log("Render")
   match.log("match?")
+
+  cards.onValue (card) ->
+    $cards[card.id].addClass "face-up"

@@ -1,18 +1,21 @@
-cardTemplate = (i, image) ->
-  "<div id='card-#{i}' class='card face-down #{image}'>#{image}</div>"
+cardTemplate = (id, image) ->
+  "<div id='#{id}' class='card face-down #{image}'>#{image}</div>"
 
-renderCard = (card, i) ->
-  Zepto(cardTemplate(i, card.image))
+renderCard = (card) ->
+  Zepto(cardTemplate(card.id, card.image))
 
 # Note, Zepto wont be ready when this function is defined, so
 # it cant be partially appplied here
 placeInDOM = ($card) ->
   $card.appendTo Zepto("#cards")
 
-renderDeck = R.mapIndexed R.compose(placeInDOM, renderCard)
+renderDeck = R.reduce (acc, card) ->
+  $card = R.compose(placeInDOM, renderCard) card
+  R.assoc card.id, $card, acc
+, {}
 
 module.exports = {
   # takes an array of card definitions (deck)
-  # returns array of card views in same order
+  # returns object of id: $card for all cards
   renderDeck
 }

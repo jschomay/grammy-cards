@@ -18,3 +18,16 @@ body {
   float: left;
   margin: 20px;
 }
+
+.card.face-down {
+  background: #ccc;
+  color: #ccc;
+}
+
+.card.face-up {
+  background: #fff;
+  color: #bbb;
+  font-size: 70px;
+  text-align: center;
+}
+
