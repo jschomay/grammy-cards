@@ -22,27 +22,27 @@ body {
 }
 
 .card.face-down {
-  background-image: url("/assets/grammy.jpg");
+  background-image: url("../assets/grammy.jpg");
 }
 
 .card.face-up.camping {
-  background-image: url("/assets/camping.jpg");
+  background-image: url("../assets/camping.jpg");
 }
 .card.face-up.candy {
-  background-image: url("/assets/candy.jpg");
+  background-image: url("../assets/candy.jpg");
 }
 .card.face-up.menorah {
-  background-image: url("/assets/menorah.jpg");
+  background-image: url("../assets/menorah.jpg");
 }
 .card.face-up.painting {
-  background-image: url("/assets/painting.jpg");
+  background-image: url("../assets/painting.jpg");
 }
 .card.face-up.park {
-  background-image: url("/assets/park.jpg");
+  background-image: url("../assets/park.jpg");
 }
 .card.face-up.reading {
-  background-image: url("/assets/reading.jpg");
+  background-image: url("../assets/reading.jpg");
 }
 .card.face-up.bath {
-  background-image: url("/assets/bath.jpg");
+  background-image: url("../assets/bath.jpg");
 }
