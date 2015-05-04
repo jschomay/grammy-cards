@@ -12,22 +12,37 @@ body {
 
 
 .card {
-  border: 2px solid black;
-  width: 212px;
+  border: 1px solid black;
+  width: 142px;
   height: 212px;
   float: left;
-  margin: 20px;
+  margin: 20px 55px;
+  background-size: cover;
+  background-position: 50% 0%;
 }
 
 .card.face-down {
-  background: #ccc;
-  color: #ccc;
+  background-image: url("/assets/grammy.jpg");
 }
 
-.card.face-up {
-  background: #fff;
-  color: #bbb;
-  font-size: 70px;
-  text-align: center;
+.card.face-up.camping {
+  background-image: url("/assets/camping.jpg");
 }
-
+.card.face-up.candy {
+  background-image: url("/assets/candy.jpg");
+}
+.card.face-up.menorah {
+  background-image: url("/assets/menorah.jpg");
+}
+.card.face-up.painting {
+  background-image: url("/assets/painting.jpg");
+}
+.card.face-up.park {
+  background-image: url("/assets/park.jpg");
+}
+.card.face-up.reading {
+  background-image: url("/assets/reading.jpg");
+}
+.card.face-up.bath {
+  background-image: url("/assets/bath.jpg");
+}

@@ -4,18 +4,49 @@ CARD_STATES =
   MATCHED: 2
 
 availableCards = [
-  "eating"
-  "playing"
-  "cleaning"
-  "cooking"
+  "apples-and-honey"
+  "bath"
+  "biking"
+  "camping"
+  "candy"
+  "challah"
+  "chanukah"
+  "chicken-soup"
+  "cruise"
+  "deli"
+  "dessing-up"
+  "dreydel"
+  "flowers"
+  "hamantashen"
+  "hebrew"
+  "ice-cream"
+  "lifting-weights"
+  "menorah"
+  "painting"
+  "park"
+  "pictures"
+  "presents"
   "reading"
-  "walking"
+  "shabbos"
+  "shopping"
+  "singing"
+  "skiing"
+  "sleeping"
+  "snowman"
+  "sukkah"
+  "swimming"
+  "tzadaka"
 ]
 
-# could be modified as a filter for specific sets of cards
-# currently returns all available cards
-cardFilter = -> R.T
-getCardSet = -> R.filter cardFilter, availableCards
+selectedCards = [
+  "camping"
+  "candy"
+  "menorah"
+  "painting"
+  "park"
+  "bath"
+]
+getCardSet = -> selectedCards
 
 # assumes pairs will be ordered together
 buildCard = R.mapIndexed (cardType, i) ->

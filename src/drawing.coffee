@@ -1,5 +1,5 @@
 cardTemplate = (id, image) ->
-  "<div id='#{id}' class='card face-down #{image}'>#{image}</div>"
+  "<div id='#{id}' class='card face-down #{image}'></div>"
 
 renderCard = (card) ->
   Zepto(cardTemplate(card.id, card.image))

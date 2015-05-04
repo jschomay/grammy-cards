@@ -99,11 +99,11 @@ Zepto ->
       affectedCards: pair
       match: match
 
-  reset = match.delay(1000)
+  reset = match.delay(1500)
 
   # card values respond a follows:
   # - on faceUp go to face up
-  # - 1000 ms after match go to face down or matched
+  # - 1500 ms after match go to face down or matched
   # faceup ----[a1]------[a1,b1]-----[a1]---[a1,a2]-----
   # reset  ----------------------f-------------------t--
   # carda1 -----u----------------d----u--------------m--
