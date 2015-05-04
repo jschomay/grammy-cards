@@ -134,4 +134,7 @@ Zepto ->
       $cards[card.id].removeClass "face-up"
       $cards[card.id].addClass "face-down"
     else if card.status is cards.CARD_STATES.MATCHED
-      $cards[card.id].css("color", "green")
+      # by turning the card invisible, it not only gives visual
+      # feedback, but also removes the view's click stream
+      # (feels kind of hacky and is a side-effect, but works)
+      $cards[card.id].css("visibility", "hidden")
