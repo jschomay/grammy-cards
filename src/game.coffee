@@ -95,39 +95,43 @@ Zepto ->
       # find a match by comparing just the card type portion
       ignoreDigits = (string) -> string.replace(/\d/, "")
       match = R.compose(R.apply(R.eq), R.map(ignoreDigits)) pair
+      # need to keep a reference to which cards are affected
       affectedCards: pair
-      action: if match then 2 else 0
+      match: match
+
+  reset = match.delay(1000)
 
   # card values respond a follows:
   # - on faceUp go to face up
-  # - 1300 ms after match go to face down or matched
+  # - 1000 ms after match go to face down or matched
   # faceup ----[a1]------[a1,b1]-----[a1]---[a1,a2]-----
   # reset  ----------------------f-------------------t--
   # carda1 -----u----------------d----u--------------m--
   # cardb1 ------------------u---d----------------------
   # carda2 -------------------------------------u----m--
-  #
-  reset = match.delay(1000)
-
   getCardStream = (card) ->
-    mapFaceUps = (faceUps) ->
+    faceUpToAction = (faceUps) ->
+      # (only the last of the faceUps array is new)
       affectedCards: [R.last(faceUps)]
-      action: 1
-    Kefir.merge [faceUps.map(mapFaceUps), reset]
+      status: cards.CARD_STATES.FACE_UP
+    resetToAction = (reset) ->
+      affectedCards: reset.affectedCards
+      status: if reset.match then cards.CARD_STATES.MATCHED else cards.CARD_STATES.FACE_DOWN
+
+    Kefir.merge [faceUps.map(faceUpToAction), reset.map(resetToAction)]
       .filter R.compose(R.contains(card.id), R.prop("affectedCards"))
-      .scan (card, e) ->
-        R.merge card, {status: e.action}
+      .scan (card, action) ->
+        R.merge card, {status: action.status}
       , card
-      .log('-----' + card.id)
 
-  cards = Kefir.merge R.map getCardStream, deck
+  cardStreams = Kefir.merge R.map getCardStream, deck
 
-  cards.onValue (card) ->
-    if card.status is 1
+  cardStreams.onValue (card) ->
+    if card.status is cards.CARD_STATES.FACE_UP
       $cards[card.id].removeClass "face-down"
       $cards[card.id].addClass "face-up"
-    else if card.status is 0
+    else if card.status is cards.CARD_STATES.FACE_DOWN
       $cards[card.id].removeClass "face-up"
       $cards[card.id].addClass "face-down"
-    else if card.status is 2
+    else if card.status is cards.CARD_STATES.MATCHED
       $cards[card.id].css("color", "green")

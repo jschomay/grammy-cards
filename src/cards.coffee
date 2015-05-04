@@ -1,6 +1,6 @@
 CARD_STATES =
-  HIDDEN: 0
-  FLIPPED: 1
+  FACE_DOWN: 0
+  FACE_UP: 1
   MATCHED: 2
 
 availableCards = [
@@ -21,7 +21,7 @@ getCardSet = -> R.filter cardFilter, availableCards
 buildCard = R.mapIndexed (cardType, i) ->
   id: cardType + (1 + i % 2) # eg. eating1 / eating2
   image: cardType
-  status: CARD_STATES.HIDDEN
+  status: CARD_STATES.FACE_DOWN
 
 makePairs = R.chain (cardType) -> [cardType, cardType]
 buildDeck = R.compose(buildCard, makePairs)
