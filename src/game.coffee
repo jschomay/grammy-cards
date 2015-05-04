@@ -94,22 +94,40 @@ Zepto ->
       # ids are the card type followed by a 1 or 2, so we can
       # find a match by comparing just the card type portion
       ignoreDigits = (string) -> string.replace(/\d/, "")
-      R.compose(R.apply(R.eq), R.map(ignoreDigits)) pair
+      match = R.compose(R.apply(R.eq), R.map(ignoreDigits)) pair
+      affectedCards: pair
+      action: if match then 2 else 0
+
+  # card values respond a follows:
+  # - on faceUp go to face up
+  # - 1300 ms after match go to face down or matched
+  # faceup ----[a1]------[a1,b1]-----[a1]---[a1,a2]-----
+  # reset  ----------------------f-------------------t--
+  # carda1 -----u----------------d----u--------------m--
+  # cardb1 ------------------u---d----------------------
+  # carda2 -------------------------------------u----m--
+  #
+  reset = match.delay(1000)
 
   getCardStream = (card) ->
-    # each card model should respond to its corresponding view
-    faceUps
-      .filter R.contains card.id
-      .scan (card, event) ->
-        R.merge card, {status: 1}
+    mapFaceUps = (faceUps) ->
+      affectedCards: [R.last(faceUps)]
+      action: 1
+    Kefir.merge [faceUps.map(mapFaceUps), reset]
+      .filter R.compose(R.contains(card.id), R.prop("affectedCards"))
+      .scan (card, e) ->
+        R.merge card, {status: e.action}
       , card
-
+      .log('-----' + card.id)
 
   cards = Kefir.merge R.map getCardStream, deck
 
-
-  cards.map(R.values).log("Render")
-  match.log("match?")
-
   cards.onValue (card) ->
-    $cards[card.id].addClass "face-up"
+    if card.status is 1
+      $cards[card.id].removeClass "face-down"
+      $cards[card.id].addClass "face-up"
+    else if card.status is 0
+      $cards[card.id].removeClass "face-up"
+      $cards[card.id].addClass "face-down"
+    else if card.status is 2
+      $cards[card.id].css("color", "green")
