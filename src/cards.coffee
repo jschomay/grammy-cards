@@ -46,7 +46,6 @@ selectedCards = [
   "park"
   "bath"
 ]
-getCardSet = -> selectedCards
 
 # assumes pairs will be ordered together
 buildCard = R.mapIndexed (cardType, i) ->
@@ -60,7 +59,8 @@ buildDeck = R.compose(buildCard, makePairs)
 randomOrderComparator = -> Math.floor(Math.random() * 3) - 1
 shuffleDeck = R.sort randomOrderComparator
 
-getDeck = R.compose(shuffleDeck, buildDeck, getCardSet)
+# takes an array of selected cards
+getDeck = R.compose(shuffleDeck, buildDeck)
 
 
 

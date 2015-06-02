@@ -1,6 +1,19 @@
 cards = require "../cards"
+drawing = require "../drawing"
 
-module.exports = (deck, $cards) ->
+module.exports = (selectedCards) ->
+
+  # TODO - pass in a stream that emits a single event when
+  # this state should start with the starting data (selected
+  # cards).
+  # On that event, run enterState to:
+  # - convert selectedCards to deck
+  # - render deck into dom
+  # - bind click handlers
+
+  deck = cards.getDeck selectedCards
+
+  $cards = drawing.renderDeck deck
 
   # takes object id: $card
   # returns array of click streams for each $card
@@ -88,4 +101,7 @@ module.exports = (deck, $cards) ->
       # (feels kind of hacky and is a side-effect, but works)
       $cards[card.id].css("visibility", "hidden")
 
+  # TODO - return stream that fires one event when all cards
+  # have been turned face up.  This stream switches to the
+  # next state
   return cardStreams
