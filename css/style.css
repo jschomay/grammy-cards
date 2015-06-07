@@ -10,11 +10,12 @@ body {
 #message {
   height: 20%;
   text-align: center;
-  font: 26px;
+  font-size: 46px;
   padding: 40px;
 }
 
 #game {
+  background: rgb(98, 132, 239);
   border: 1px solid #555;
   width: 1024px;
   height: 768px;
@@ -23,17 +24,24 @@ body {
 
 
 .card {
-  border: 1px solid black;
   width: 142px;
   height: 212px;
   float: left;
   margin: 20px 55px;
-  background-size: cover;
-  background-position: 50% 0%;
+  border: 3px solid white;
+  border-radius: 10px;
+  background-size: 84%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: white;
+  box-shadow: 1px 3px 9px -3px;
 }
 
 .card.selected {
-  border: 2px solid gold;
+  border: 3px solid gold;
+  border: 3px solid gold;
+  box-shadow: 4px 14px 30px -1px;
+  transform: translateY(-10px);
 }
 
 .card.face-down {

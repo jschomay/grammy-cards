@@ -83,9 +83,9 @@ module.exports = (selectedCards) ->
   updateTable = (card) ->
     if card.status is cards.CARD_STATES.FACE_UP
       $cards[card.id].removeClass "face-down"
-      $cards[card.id].addClass "face-up"
+      $cards[card.id].addClass "face-up selected"
     else if card.status is cards.CARD_STATES.FACE_DOWN
-      $cards[card.id].removeClass "face-up"
+      $cards[card.id].removeClass "face-up selected"
       $cards[card.id].addClass "face-down"
     else if card.status is cards.CARD_STATES.MATCHED
       # by turning the card invisible, it not only gives visual

@@ -33,6 +33,7 @@ module.exports = ->
   finished = selectedCards
     .skipWhile R.compose(R.gt(4), R.length)
     .take(1)
+    .delay 1000
     .map (selectedCards) ->
       ["play", selectedCards]
     .onValue ->
