@@ -1,9 +1,20 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   padding: 0;
 }
 
-#cards {
+#message {
+  height: 20%;
+  text-align: center;
+  font: 26px;
+  padding: 40px;
+}
+
+#game {
   border: 1px solid #555;
   width: 1024px;
   height: 768px;
@@ -19,6 +30,10 @@ body {
   margin: 20px 55px;
   background-size: cover;
   background-position: 50% 0%;
+}
+
+.card.selected {
+  border: 2px solid gold;
 }
 
 .card.face-down {

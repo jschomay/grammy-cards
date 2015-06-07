@@ -3,14 +3,6 @@ drawing = require "../drawing"
 
 module.exports = (selectedCards) ->
 
-  # TODO - pass in a stream that emits a single event when
-  # this state should start with the starting data (selected
-  # cards).
-  # On that event, run enterState to:
-  # - convert selectedCards to deck
-  # - render deck into dom
-  # - bind click handlers
-
   deck = cards.getDeck selectedCards
 
   $cards = drawing.renderDeck deck
@@ -88,7 +80,7 @@ module.exports = (selectedCards) ->
 
   cardStreams = Kefir.merge R.map getCardStream, deck
 
-  cardStreams.onValue (card) ->
+  updateTable = (card) ->
     if card.status is cards.CARD_STATES.FACE_UP
       $cards[card.id].removeClass "face-down"
       $cards[card.id].addClass "face-up"
@@ -101,7 +93,19 @@ module.exports = (selectedCards) ->
       # (feels kind of hacky and is a side-effect, but works)
       $cards[card.id].css("visibility", "hidden")
 
-  # TODO - return stream that fires one event when all cards
-  # have been turned face up.  This stream switches to the
-  # next state
-  return cardStreams
+  cardStreams.onValue updateTable
+
+  completedCards = match
+    .filter R.prop("match")
+    .scan (matchesSoFar, {affectedCards}) ->
+      R.concat affectedCards, matchesSoFar
+    , []
+
+  finish = completedCards
+    .filter R.compose(R.eq(deck.length), R.length)
+    .take 1
+    .delay 2000
+    .onValue ->
+      cardStreams.offValue updateTable
+      drawing.clearTable()
+    .map (completedCards) -> ["youWin", completedCards]

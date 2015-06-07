@@ -1,44 +1,29 @@
 cards = require "./cards"
-# startPlayGameState = require "./states/play"
+frpfsm = require("../src/fsm");
+selectGameState = require "./states/select"
+playGameState = require "./states/play"
+endGameState = require "./states/end"
 
 # on document ready
 Zepto ->
 
-  # TODO - generate this async through stream
-  selectedCards = [
-    "camping"
-    "candy"
-    "menorah"
-    "painting"
-    "park"
-    "bath"
-  ]
+  frpfsm.loadState
+    name: "Select"
+    state: selectGameState
+    transitions:
+      "play": playGameState
 
-  # cardStreams = startPlayGameState selectedCards
+  frpfsm.loadState
+    name: "Play"
+    state: playGameState
+    transitions:
+      "youWin": endGameState
 
-  # STATES:
-  #   START: enterStartGameState
-  #   PLAY: enterPlayGameState
+  frpfsm.loadState
+    name: "End"
+    state: endGameState
+    transitions:
+      "startOver": selectGameState
 
-  # TODO
-  # - have states return a key for the state instead of the function
-  # - or use the transition mapper
-  # - log state name instead of function
-  # - test with more states
-  # - pull out into separate file?
-  # - use actual states
-
-  STATES =
-    START: (data) -> Kefir.later(1000, [STATES.PLAY])
-    PLAY: (data) -> Kefir.later(2000, [STATES.START, "You won"])
-
-  nextState = ([next, scope]) ->
-    transitionTo = next scope
-    transitionTo
-      .take(1)
-      .flatMap(nextState)
-      .toProperty(-> [next, scope])
-
-  currentState = nextState [STATES.START, "start"]
-
-  currentState.log("Entering state")
+  debug = true;
+  currentState = frpfsm.start(selectGameState, null, debug)
