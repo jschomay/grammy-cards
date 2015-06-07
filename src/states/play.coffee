@@ -88,10 +88,11 @@ module.exports = (selectedCards) ->
       $cards[card.id].removeClass "face-up selected"
       $cards[card.id].addClass "face-down"
     else if card.status is cards.CARD_STATES.MATCHED
+      $cards[card.id].addClass "matched"
       # by turning the card invisible, it not only gives visual
       # feedback, but also removes the view's click stream
       # (feels kind of hacky and is a side-effect, but works)
-      $cards[card.id].css("visibility", "hidden")
+      # $cards[card.id].css("visibility", "hidden")
 
   cardStreams.onValue updateTable
 
@@ -104,7 +105,7 @@ module.exports = (selectedCards) ->
   finish = completedCards
     .filter R.compose(R.eq(deck.length), R.length)
     .take 1
-    .delay 2000
+    .delay 3000
     .onValue ->
       cardStreams.offValue updateTable
       drawing.clearTable()
