@@ -6,7 +6,9 @@ module.exports = ->
   deck = cards.getAvailableCards()
   $cards = drawing.renderDeck deck
 
-  drawing.renderMessage "Pick the cards you want to play with:"
+  drawing.renderMessage "Pick 4 cards to play with:"
+
+  drawing.setMode "select"
 
   highlight = (selected) ->
     for card in selected

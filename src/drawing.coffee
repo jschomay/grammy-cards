@@ -20,11 +20,15 @@ renderDeck = R.reduce (acc, card) ->
 , {}
 
 clearTable = ->
+  Zepto("#game").removeClass()
   Zepto("#cards").empty()
   Zepto("#message").hide()
 
 renderMessage = (message) ->
   Zepto("#message").show().text message
+
+setMode = (mode) ->
+  Zepto("#game").addClass(mode)
 
 
 module.exports = {
@@ -33,4 +37,5 @@ module.exports = {
   renderDeck
   clearTable
   renderMessage
+  setMode
 }

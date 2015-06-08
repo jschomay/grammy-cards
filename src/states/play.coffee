@@ -5,6 +5,8 @@ module.exports = (selectedCards) ->
 
   deck = cards.getDeck selectedCards
 
+  drawing.setMode "play"
+
   $cards = drawing.renderDeck deck
 
   # takes object id: $card

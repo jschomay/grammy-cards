@@ -9,10 +9,10 @@ body {
 }
 
 #message {
-  height: 20%;
   text-align: center;
   font-size: 46px;
-  padding: 40px;
+  padding: 0px;
+  margin: 30px;
 }
 
 #game {
@@ -38,6 +38,18 @@ body {
   background-color: white;
   -webkit-box-shadow: 1px 3px 9px -3px;
           box-shadow: 1px 3px 9px -3px;
+}
+
+.select .card {
+  width: 192px;
+  height: 293px;
+  margin: 16px 31px;
+}
+
+.play .card {
+  width: 205px;
+  height: 318px;
+  margin: 33px 25px;
 }
 
 .card.selected {
