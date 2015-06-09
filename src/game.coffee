@@ -8,6 +8,8 @@ endGameState = require "./states/end"
 # on document ready
 Zepto ->
 
+  FastClick.attach(document.body)
+
   frpfsm.loadState
     name: "Preload"
     state: preloadGameState
