@@ -39,15 +39,6 @@ availableCards = [
   "tzadaka"
 ]
 
-availableCards2 = [
-  "camping"
-  "candy"
-  "menorah"
-  "painting"
-  "park"
-  "bath"
-]
-
 # assumes pairs will be ordered together
 buildCard = R.mapIndexed (cardType, i) ->
   id: cardType + (1 + i % 2) # eg. eating1 / eating2
@@ -63,14 +54,13 @@ shuffleDeck = R.sort randomOrderComparator
 # takes an array of selected cards
 getDeck = R.compose(shuffleDeck, buildDeck)
 
-getAvailableCards = -> R.map (cardType) ->
+getCards = R.map (cardType) ->
   id: cardType
   image: cardType
   status: CARD_STATES.FACE_UP
-, availableCards2
 
 module.exports = {
   CARD_STATES
   getDeck
-  getAvailableCards
+  getCards
 }

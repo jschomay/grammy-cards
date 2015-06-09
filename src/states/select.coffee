@@ -1,9 +1,9 @@
 cards = require "../cards"
 drawing = require "../drawing"
 
-module.exports = ->
+module.exports = (availableImages) ->
 
-  deck = cards.getAvailableCards()
+  deck = cards.getCards availableImages
   $cards = drawing.renderDeck deck
 
   drawing.renderMessage "Pick 4 cards to play with:"
