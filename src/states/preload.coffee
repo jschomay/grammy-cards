@@ -13,6 +13,8 @@ module.exports = (availableImages) ->
 
   loadAssets availableImages
 
+  loader.addImage "assets/grammy.jpg"
+
   loader.start()
 
   Kefir.fromCallback(loader.addCompletionListener)
