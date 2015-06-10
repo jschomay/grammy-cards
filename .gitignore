@@ -29,4 +29,6 @@ tmp/
 bower_components
 
 
+/scripts
+/css
 /raw_scans
