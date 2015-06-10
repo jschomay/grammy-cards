@@ -8,4 +8,11 @@ exports.config =
       joinTo:
         'scripts/game.js': /^src/
         'scripts/vendor.js': /^vendor/
+    stylesheets:
+        joinTo: 'css/style.css'
   sourceMaps: false
+  plugins:
+    postcss:
+      processors: [
+        require('autoprefixer')(['last 8 versions']),
+      ]
