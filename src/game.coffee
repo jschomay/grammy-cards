@@ -36,12 +36,12 @@ Zepto ->
 
 
   availableCards = [
-    "camping"
-    "candy"
-    "menorah"
+    "bath"
+    "dressing-up"
+    "ice-cream"
     "painting"
     "park"
-    "bath"
+    "reading"
   ]
   debug = true;
   currentState = frpfsm.start(preloadGameState, availableCards, debug)

@@ -99,6 +99,12 @@ body {
 .card.face-up.bath {
   background-image: url("../assets/bath.jpg");
 }
+.card.face-up.dressing-up {
+  background-image: url("../assets/dressing-up.jpg");
+}
+.card.face-up.ice-cream {
+  background-image: url("../assets/ice-cream.jpg");
+}
 
 
 
