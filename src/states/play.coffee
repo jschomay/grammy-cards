@@ -55,7 +55,12 @@ module.exports = (selectedCards) ->
       affectedCards: pair
       match: match
 
-  reset = match.delay(1500)
+  reset = match.flatMap (pair) ->
+    if pair.match
+      return Kefir.later 500, pair
+    else
+      return Kefir.later 1500, pair
+
 
   # card values respond a follows:
   # - on faceUp go to face up
