@@ -1,6 +1,7 @@
 cards = require "./cards"
 frpfsm = require("../src/fsm");
 preloadGameState = require "./states/preload"
+startGameState = require "./states/start"
 selectGameState = require "./states/select"
 playGameState = require "./states/play"
 endGameState = require "./states/end"
@@ -25,7 +26,13 @@ Zepto ->
     name: "Preload"
     fn: preloadGameState
     transitions:
-      "assetsReady": "Select"
+      "assetsReady": "Start"
+
+  frpfsm.loadState
+    name: "Start"
+    fn: startGameState
+    transitions:
+      "begin": "Select"
 
   frpfsm.loadState
     name: "Select"
@@ -43,7 +50,7 @@ Zepto ->
     name: "End"
     fn: endGameState
     transitions:
-      "startOver": "Select"
+      "startOver": "Start"
 
   # start!
   debug = true;

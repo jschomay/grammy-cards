@@ -19,4 +19,4 @@ module.exports = (availableImages) ->
 
   Kefir.fromCallback(loader.addCompletionListener)
     .map ->
-      ["assetsReady", availableImages]
+      ["assetsReady"]

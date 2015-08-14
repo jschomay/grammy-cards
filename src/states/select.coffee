@@ -1,12 +1,12 @@
 cards = require "../cards"
 drawing = require "../drawing"
 
-module.exports = (availableImages) ->
+module.exports = (availableImages, numberOfCardsInPlay) ->
 
   deck = cards.getCards availableImages
   $cards = drawing.renderDeck deck
 
-  drawing.renderMessage "Pick 4 cards to play with:"
+  drawing.renderMessage "Pick #{numberOfCardsInPlay} cards to play with:"
 
   drawing.setMode "select"
 
@@ -33,7 +33,7 @@ module.exports = (availableImages) ->
     .onValue highlight
 
   finished = selectedCards
-    .skipWhile R.compose(R.gt(4), R.length)
+    .skipWhile R.compose(R.gt(numberOfCardsInPlay), R.length)
     .take(1)
     .delay 1000
     .map (selectedCards) ->
