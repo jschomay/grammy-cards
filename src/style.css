@@ -5,11 +5,66 @@
 body {
   margin: 0;
   padding: 0;
+  font-family: 'Schoolbell', cursive;
+}
+
+#load-font {
+  visibility: hidden;
+}
+
+#title {
+  text-align: center;
+  font-size: 90px;
+  color: white;
+  padding: 0px;
+  margin: 30px;
+}
+
+#subtitle {
+  text-align: center;
+  font-size: 40px;
+  color: wheat;
+  padding: 0px;
+  margin: 30px;
+}
+
+#title-page-card {
+  width: 290px;
+  height: 440px;
+  transform: rotate(-6deg);
+}
+
+#select-mode {
+  padding: 70px;
+  float: left;
+}
+
+#select-mode > div {
+  margin-bottom: 30px;
+  font-size: 40px;
+  cursor: pointer;
+  background-color: white;
+  border: 1px solid;
+  padding: 5px 22px;
+  border-radius: 7px;
+}
+
+#select-mode #two-pairs {
+  color: #17CA17;
+}
+
+#select-mode #three-pairs {
+  color: #F72E53;
+}
+
+#select-mode #four-pairs {
+  color: #D049EF;
 }
 
 #message {
   text-align: center;
   font-size: 46px;
+  color: white;
   padding: 0px;
   margin: 30px;
 }

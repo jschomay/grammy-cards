@@ -6,11 +6,11 @@ module.exports = () ->
   drawing.setMode "start"
   drawing.renderContent startTemplate
 
-  twoPairs = Kefir.fromEvents($('#2-pairs'), 'click')
+  twoPairs = Kefir.fromEvents($('#two-pairs'), 'click')
     .map -> 2
-  threePairs = Kefir.fromEvents($('#3-pairs'), 'click')
+  threePairs = Kefir.fromEvents($('#three-pairs'), 'click')
     .map -> 3
-  fourPairs = Kefir.fromEvents($('#4-pairs'), 'click')
+  fourPairs = Kefir.fromEvents($('#four-pairs'), 'click')
     .map -> 4
 
   Kefir.merge [twoPairs, threePairs, fourPairs]
