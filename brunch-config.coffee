@@ -8,6 +8,9 @@ exports.config =
       joinTo:
         'scripts/game.js': /^src/
         'scripts/vendor.js': /^vendor/
+    templates:
+      joinTo:
+        'scripts/game.js': /^src\/templates/
     stylesheets:
         joinTo: 'css/style.css'
   sourceMaps: false

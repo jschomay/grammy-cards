@@ -18,5 +18,8 @@ module.exports = (availableImages) ->
   loader.start()
 
   Kefir.fromCallback(loader.addCompletionListener)
+    .take(1)
     .map ->
       ["assetsReady"]
+    .onValue ->
+      drawing.clearTable()
