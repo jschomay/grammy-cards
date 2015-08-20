@@ -5,7 +5,12 @@ module.exports = (selectedCards) ->
 
   deck = cards.getDeck selectedCards
 
-  drawing.setMode "play"
+  numPairs = switch selectedCards.length
+    when 2 then "two"
+    when 3 then "three"
+    when 4 then "four"
+
+  drawing.setMode "play #{numPairs}-pairs"
 
   $cards = drawing.renderDeck deck
 
