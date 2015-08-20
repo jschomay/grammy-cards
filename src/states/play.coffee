@@ -117,8 +117,7 @@ module.exports = (selectedCards) ->
   finish = completedCards
     .filter R.compose(R.eq(deck.length), R.length)
     .take 1
-    .delay 3000
+    .delay 2000
     .onValue ->
       cardStreams.offValue updateTable
-      drawing.clearTable()
     .map (completedCards) -> ["youWin", completedCards]
