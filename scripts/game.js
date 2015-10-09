@@ -1,1 +1,588 @@
-!function(){"use strict";var e="undefined"!=typeof window?window:global;if("function"!=typeof e.require){var r={},t={},n=function(e,r){return{}.hasOwnProperty.call(e,r)},a=function(e,r){var t,n,a=[];t=/^\.\.?(\/|$)/.test(r)?[e,r].join("/").split("/"):r.split("/");for(var s=0,i=t.length;i>s;s++)n=t[s],".."===n?a.pop():"."!==n&&""!==n&&a.push(n);return a.join("/")},s=function(e){return e.split("/").slice(0,-1).join("/")},i=function(r){return function(t){var n=s(r),i=a(n,t);return e.require(i,r)}},o=function(e,r){var n={id:e,exports:{}};return t[e]=n,r(n.exports,i(e),n),n.exports},u=function(e,s){var i=a(e,".");if(null==s&&(s="/"),n(t,i))return t[i].exports;if(n(r,i))return o(i,r[i]);var u=a(i,"./index");if(n(t,u))return t[u].exports;if(n(r,u))return o(u,r[u]);throw new Error('Cannot find module "'+e+'" from "'+s+'"')},c=function(e,t){if("object"==typeof e)for(var a in e)n(e,a)&&(r[a]=e[a]);else r[e]=t},f=function(){var e=[];for(var t in r)n(r,t)&&e.push(t);return e};e.require=u,e.require.define=c,e.require.register=c,e.require.list=f,e.require.brunch=!0}}(),require.register("src/cards",function(e,r,t){var n,a,s,i,o,u,c,f,d;n={FACE_DOWN:0,FACE_UP:1,MATCHED:2,SELECTED:3},a=["apples-and-honey","bath","biking","camping","candy","challah","chanukah","chicken-soup","cruise","deli","dessing-up","dreydel","flowers","hamantashen","hebrew","ice-cream","lifting-weights","menorah","painting","park","pictures","presents","reading","shabbos","shopping","singing","skiing","sleeping","snowman","sukkah","swimming","tzadaka"],s=R.mapIndexed(function(e,r){return{id:e+(1+r%2),image:e,status:n.FACE_DOWN}}),c=R.chain(function(e){return[e,e]}),i=R.compose(s,c),f=function(){return Math.floor(3*Math.random())-1},d=R.sort(f),u=R.compose(d,i),o=R.map(function(e){return{id:e,image:e,status:n.FACE_UP}}),t.exports={CARD_STATES:n,getDeck:u,getCards:o}}),require.register("src/drawing",function(e,r,t){var n,a,s,i,o,u,c,f,d;n=r("./cards").CARD_STATES,s={},s[n.FACE_DOWN]="face-down",s[n.FACE_UP]="face-up",a=function(e,r,t){return"<div id='"+e+"' class='card "+s[t]+" "+r+"'></div>"},u=function(e){return Zepto(a(e.id,e.image,e.status))},o=function(e){return e.appendTo(Zepto("#cards"))},c=R.reduce(function(e,r){var t;return t=R.compose(o,u)(r),R.assoc(r.id,t,e)},{}),i=function(){return Zepto("#game").removeClass(),Zepto("#cards").empty(),Zepto("#message").hide()},f=function(e){return Zepto("#message").show().text(e)},d=function(e){return Zepto("#game").addClass(e)},t.exports={renderDeck:c,clearTable:i,renderMessage:f,setMode:d}}),require.register("src/fsm",function(e,r,t){var n,a;n={},a=function(e,r){var t,s;return s=r[0],t=r[1],e&&console.debug("Enter "+n[s].name.toUpperCase()+" with initial data "+t),s(t).take(1).map(function(r){return function(r){var t,a,i;return i=r[0],t=r[1],e&&console.debug("Exit "+n[s].name.toUpperCase()+' with transition "'+i+'"'),a=n[s].transitions[i],[a,t]}}(this)).flatMap(a.bind(this,e)).toProperty(function(){return[n[s].name,t]})},t.exports={loadState:function(e){return n[e.state]={name:e.name,transitions:e.transitions}},start:function(e,r,t){var n;return null==t&&(t=!1),n=a(t,[e,r]),n.onAny(function(){})}}}),require.register("src/game",function(e,r,t){var n,a,s,i,o,u;n=r("./cards"),s=r("../src/fsm"),o=r("./states/preload"),u=r("./states/select"),i=r("./states/play"),a=r("./states/end"),Zepto(function(){var e,r,t;return FastClick.attach(document.body),s.loadState({name:"Preload",state:o,transitions:{assetsReady:u}}),s.loadState({name:"Select",state:u,transitions:{play:i}}),s.loadState({name:"Play",state:i,transitions:{youWin:a}}),s.loadState({name:"End",state:a,transitions:{startOver:u}}),e=["bath","dressing-up","ice-cream","painting","park","reading"],t=!0,r=s.start(o,e,t)})}),require.register("src/states/end",function(e,r,t){var n;n=r("../drawing"),t.exports=function(e){return n.renderMessage("YOU WIN!"),Kefir.later(2e3,["startOver"]).onValue(function(){return n.clearTable()})}}),require.register("src/states/play",function(e,r,t){var n,a;n=r("../cards"),a=r("../drawing"),t.exports=function(e){var r,t,s,i,o,u,c,f,d,p,l,m,g;return o=n.getDeck(e),a.setMode("play"),r=a.renderDeck(o),d=R.pipe(R.toPairs,R.map(function(e){var r,t;return t=e[0],r=e[1],Kefir.fromEvents(r,"click",R.always(t))})),t=d(r),g=Kefir.merge(t).scan(function(e,r){var t;return 2===e.faceUps.length?{faceUps:[r],valid:!0}:R.contains(r,e.faceUps)?R.merge(e,{valid:!1}):(t=R.append(r,e.faceUps),{faceUps:t,valid:!0})},{faceUps:[],valid:!1}).map(R.prop("valid")),u=Kefir.merge(t).filterBy(g).scan(function(e,r){return 2===e.length?[r]:R.append(r,e)},[]),p=u.filter(R.compose(R.eq(2),R.length)).map(function(e){var r;return r=function(e){return e.replace(/\d/,"")},p=R.compose(R.apply(R.eq),R.map(r))(e),{affectedCards:e,match:p}}),l=p.delay(1500),f=function(e){var r,t;return r=function(e){return{affectedCards:[R.last(e)],status:n.CARD_STATES.FACE_UP}},t=function(e){return{affectedCards:e.affectedCards,status:e.match?n.CARD_STATES.MATCHED:n.CARD_STATES.FACE_DOWN}},Kefir.merge([u.map(r),l.map(t)]).filter(R.compose(R.contains(e.id),R.prop("affectedCards"))).scan(function(e,r){return R.merge(e,{status:r.status})},e)},s=Kefir.merge(R.map(f,o)),m=function(e){return e.status===n.CARD_STATES.FACE_UP?(r[e.id].removeClass("face-down"),r[e.id].addClass("face-up selected")):e.status===n.CARD_STATES.FACE_DOWN?(r[e.id].removeClass("face-up selected"),r[e.id].addClass("face-down")):e.status===n.CARD_STATES.MATCHED?r[e.id].addClass("matched"):void 0},s.onValue(m),i=p.filter(R.prop("match")).scan(function(e,r){var t;return t=r.affectedCards,R.concat(t,e)},[]),c=i.filter(R.compose(R.eq(o.length),R.length)).take(1).delay(3e3).onValue(function(){return s.offValue(m),a.clearTable()}).map(function(e){return["youWin",e]})}}),require.register("src/states/preload",function(e,r,t){var n;n=r("../drawing"),t.exports=function(e){var r,t,a;return n.renderMessage("Loading..."),t=new PxLoader,a=function(e){return"assets/"+e+".jpg"},r=R.forEach(R.compose(t.addImage.bind(t),a)),r(e),t.addImage("assets/grammy.jpg"),t.start(),Kefir.fromCallback(t.addCompletionListener).map(function(){return["assetsReady",e]})}}),require.register("src/states/select",function(e,r,t){var n,a,s=[].indexOf||function(e){for(var r=0,t=this.length;t>r;r++)if(r in this&&this[r]===e)return r;return-1};n=r("../cards"),a=r("../drawing"),t.exports=function(e){var r,t,i,o,u,c,f;return i=n.getCards(e),r=a.renderDeck(i),a.renderMessage("Pick 4 cards to play with:"),a.setMode("select"),u=function(e){var t,n,a,s;for(s=[],n=0,a=e.length;a>n;n++)t=e[n],s.push(r[t].addClass("selected"));return s},c=R.pipe(R.toPairs,R.map(function(e){var r,t;return t=e[0],r=e[1],Kefir.fromEvents(r,"click",R.always(t))})),t=c(r),f=Kefir.merge(t).scan(function(e,r){return s.call(e,r)>=0?e:R.append(r,e)},[]).onValue(u),o=f.skipWhile(R.compose(R.gt(4),R.length)).take(1).delay(1e3).map(function(e){return["play",e]}).onValue(function(){return f.offValue(u),a.clearTable()})}});
+(function(/*! Brunch !*/) {
+  'use strict';
+
+  var globals = typeof window !== 'undefined' ? window : global;
+  if (typeof globals.require === 'function') return;
+
+  var modules = {};
+  var cache = {};
+
+  var has = function(object, name) {
+    return ({}).hasOwnProperty.call(object, name);
+  };
+
+  var expand = function(root, name) {
+    var results = [], parts, part;
+    if (/^\.\.?(\/|$)/.test(name)) {
+      parts = [root, name].join('/').split('/');
+    } else {
+      parts = name.split('/');
+    }
+    for (var i = 0, length = parts.length; i < length; i++) {
+      part = parts[i];
+      if (part === '..') {
+        results.pop();
+      } else if (part !== '.' && part !== '') {
+        results.push(part);
+      }
+    }
+    return results.join('/');
+  };
+
+  var dirname = function(path) {
+    return path.split('/').slice(0, -1).join('/');
+  };
+
+  var localRequire = function(path) {
+    return function(name) {
+      var dir = dirname(path);
+      var absolute = expand(dir, name);
+      return globals.require(absolute, path);
+    };
+  };
+
+  var initModule = function(name, definition) {
+    var module = {id: name, exports: {}};
+    cache[name] = module;
+    definition(module.exports, localRequire(name), module);
+    return module.exports;
+  };
+
+  var require = function(name, loaderPath) {
+    var path = expand(name, '.');
+    if (loaderPath == null) loaderPath = '/';
+
+    if (has(cache, path)) return cache[path].exports;
+    if (has(modules, path)) return initModule(path, modules[path]);
+
+    var dirIndex = expand(path, './index');
+    if (has(cache, dirIndex)) return cache[dirIndex].exports;
+    if (has(modules, dirIndex)) return initModule(dirIndex, modules[dirIndex]);
+
+    throw new Error('Cannot find module "' + name + '" from '+ '"' + loaderPath + '"');
+  };
+
+  var define = function(bundle, fn) {
+    if (typeof bundle === 'object') {
+      for (var key in bundle) {
+        if (has(bundle, key)) {
+          modules[key] = bundle[key];
+        }
+      }
+    } else {
+      modules[bundle] = fn;
+    }
+  };
+
+  var list = function() {
+    var result = [];
+    for (var item in modules) {
+      if (has(modules, item)) {
+        result.push(item);
+      }
+    }
+    return result;
+  };
+
+  globals.require = require;
+  globals.require.define = define;
+  globals.require.register = define;
+  globals.require.list = list;
+  globals.require.brunch = true;
+})();
+require.register("src/cards", function(exports, require, module) {
+var CARD_STATES, availableCards, buildCard, buildDeck, getCards, getDeck, makePairs, randomOrderComparator, shuffleDeck;
+
+CARD_STATES = {
+  FACE_DOWN: 0,
+  FACE_UP: 1,
+  MATCHED: 2,
+  SELECTED: 3
+};
+
+availableCards = ["apples-and-honey", "bath", "biking", "camping", "candy", "challah", "chanukah", "chicken-soup", "cruise", "deli", "dessing-up", "dreydel", "flowers", "hamantashen", "hebrew", "ice-cream", "lifting-weights", "menorah", "painting", "park", "pictures", "presents", "reading", "shabbos", "shopping", "singing", "skiing", "sleeping", "snowman", "sukkah", "swimming", "tzadaka"];
+
+buildCard = R.mapIndexed(function(cardType, i) {
+  return {
+    id: cardType + (1 + i % 2),
+    image: cardType,
+    status: CARD_STATES.FACE_DOWN
+  };
+});
+
+makePairs = R.chain(function(cardType) {
+  return [cardType, cardType];
+});
+
+buildDeck = R.compose(buildCard, makePairs);
+
+randomOrderComparator = function() {
+  return Math.floor(Math.random() * 3) - 1;
+};
+
+shuffleDeck = R.sort(randomOrderComparator);
+
+getDeck = R.compose(shuffleDeck, buildDeck);
+
+getCards = R.map(function(cardType) {
+  return {
+    id: cardType,
+    image: cardType,
+    status: CARD_STATES.FACE_UP
+  };
+});
+
+module.exports = {
+  CARD_STATES: CARD_STATES,
+  getDeck: getDeck,
+  getCards: getCards
+};
+
+});
+
+require.register("src/drawing", function(exports, require, module) {
+var CARD_STATES, cardTemplate, classMap, clearTable, placeInDOM, renderCard, renderContent, renderDeck, renderMessage, setMode;
+
+CARD_STATES = require("./cards").CARD_STATES;
+
+classMap = {};
+
+classMap[CARD_STATES.FACE_DOWN] = "face-down";
+
+classMap[CARD_STATES.FACE_UP] = "face-up";
+
+cardTemplate = function(id, image, status) {
+  return "<div id='" + id + "' class='card " + classMap[status] + " " + image + "'></div>";
+};
+
+renderCard = function(card) {
+  return Zepto(cardTemplate(card.id, card.image, card.status));
+};
+
+placeInDOM = function($card) {
+  return $card.appendTo(Zepto("#cards"));
+};
+
+renderDeck = R.reduce(function(acc, card) {
+  var $card;
+  $card = R.compose(placeInDOM, renderCard)(card);
+  return R.assoc(card.id, $card, acc);
+}, {});
+
+clearTable = function() {
+  Zepto("#game").removeClass();
+  Zepto("#cards").empty();
+  Zepto("#content").empty();
+  return Zepto("#message").empty().hide();
+};
+
+renderMessage = function(message) {
+  return Zepto("#message").show().text(message);
+};
+
+renderContent = function(template, context) {
+  return Zepto("#content").html(template(context));
+};
+
+setMode = function(mode) {
+  return Zepto("#game").addClass(mode);
+};
+
+module.exports = {
+  renderDeck: renderDeck,
+  clearTable: clearTable,
+  renderContent: renderContent,
+  renderMessage: renderMessage,
+  setMode: setMode
+};
+
+});
+
+require.register("src/fsm", function(exports, require, module) {
+var STATES, enterState;
+
+STATES = {};
+
+enterState = function(debug, _arg) {
+  var initialData, requestedState, stateName;
+  stateName = _arg[0], initialData = _arg[1];
+  requestedState = STATES[stateName];
+  if (debug) {
+    console.debug("Enter " + (stateName.toUpperCase()) + " with initial data " + initialData);
+  }
+  return requestedState.fn(initialData).take(1).map((function(_this) {
+    return function(_arg1) {
+      var exitData, nextState, transition;
+      transition = _arg1[0], exitData = _arg1[1];
+      if (debug) {
+        console.debug("Exit " + (stateName.toUpperCase()) + " with transition \"" + transition + "\" and exit data " + exitData);
+      }
+      nextState = requestedState.transitions[transition];
+      return [nextState, exitData];
+    };
+  })(this)).flatMap(enterState.bind(this, debug)).toProperty(function() {
+    return [stateName, initialData];
+  });
+};
+
+module.exports = {
+  loadState: function(stateConfig) {
+    return STATES[stateConfig.name] = {
+      fn: stateConfig.fn,
+      transitions: stateConfig.transitions
+    };
+  },
+  start: function(stateName, initialData, debug) {
+    var currentState;
+    if (debug == null) {
+      debug = false;
+    }
+    currentState = enterState(debug, [stateName, initialData]);
+    return currentState.onAny(function() {});
+  }
+};
+
+});
+
+require.register("src/game", function(exports, require, module) {
+var availableCards, cards, endGameState, frpfsm, playGameState, preloadGameState, selectGameState, startGameState;
+
+cards = require("./cards");
+
+frpfsm = require("../src/fsm");
+
+preloadGameState = require("./states/preload");
+
+startGameState = require("./states/start");
+
+selectGameState = require("./states/select");
+
+playGameState = require("./states/play");
+
+endGameState = require("./states/end");
+
+availableCards = ["bath", "dressing-up", "ice-cream", "painting", "park", "reading", "camping", "candy"];
+
+Zepto(function() {
+  var currentState, debug;
+  FastClick.attach(document.body);
+  frpfsm.loadState({
+    name: "Preload",
+    fn: preloadGameState,
+    transitions: {
+      "assetsReady": "Start"
+    }
+  });
+  frpfsm.loadState({
+    name: "Start",
+    fn: startGameState,
+    transitions: {
+      "begin": "Select"
+    }
+  });
+  frpfsm.loadState({
+    name: "Select",
+    fn: selectGameState.bind(null, availableCards),
+    transitions: {
+      "play": "Play"
+    }
+  });
+  frpfsm.loadState({
+    name: "Play",
+    fn: playGameState,
+    transitions: {
+      "youWin": "End"
+    }
+  });
+  frpfsm.loadState({
+    name: "End",
+    fn: endGameState,
+    transitions: {
+      "startOver": "Start"
+    }
+  });
+  debug = true;
+  return currentState = frpfsm.start("Preload", availableCards, debug);
+});
+
+});
+
+require.register("src/states/end", function(exports, require, module) {
+var drawing, winTemplate;
+
+drawing = require("../drawing");
+
+winTemplate = require("../templates/win");
+
+module.exports = function(winningCards) {
+  drawing.setMode("end");
+  drawing.renderContent(winTemplate);
+  Kefir.later(500).onValue(function() {
+    return $('#end-page-card').addClass('appear');
+  });
+  return Kefir.fromEvents($('#play-again'), 'click').take(1).map(function() {
+    return ["startOver"];
+  }).onValue(function() {
+    return drawing.clearTable();
+  });
+};
+
+});
+
+require.register("src/states/play", function(exports, require, module) {
+var cards, drawing;
+
+cards = require("../cards");
+
+drawing = require("../drawing");
+
+module.exports = function(selectedCards) {
+  var $cards, cardClicks, cardStreams, completedCards, deck, faceUps, finish, getCardStream, makeClickStreams, match, numPairs, reset, updateTable, validFlip;
+  deck = cards.getDeck(selectedCards);
+  numPairs = (function() {
+    switch (selectedCards.length) {
+      case 2:
+        return "two";
+      case 3:
+        return "three";
+      case 4:
+        return "four";
+    }
+  })();
+  drawing.setMode("play " + numPairs + "-pairs");
+  $cards = drawing.renderDeck(deck);
+  makeClickStreams = R.pipe(R.toPairs, R.map(function(elem) {
+    var $card, id;
+    id = elem[0];
+    $card = elem[1];
+    return Kefir.fromEvents($card, "click", R.always(id));
+  }));
+  cardClicks = makeClickStreams($cards);
+  validFlip = Kefir.merge(cardClicks).scan(function(acc, event) {
+    var faceUps;
+    if (acc.faceUps.length === 2) {
+      return {
+        faceUps: [event],
+        valid: true
+      };
+    } else {
+      if (R.contains(event, acc.faceUps)) {
+        return R.merge(acc, {
+          valid: false
+        });
+      } else {
+        faceUps = R.append(event, acc.faceUps);
+        return {
+          faceUps: faceUps,
+          valid: true
+        };
+      }
+    }
+  }, {
+    faceUps: [],
+    valid: false
+  }).map(R.prop("valid"));
+  faceUps = Kefir.merge(cardClicks).filterBy(validFlip).scan(function(faceUps, event) {
+    if (faceUps.length === 2) {
+      return [event];
+    } else {
+      return R.append(event, faceUps);
+    }
+  }, []);
+  match = faceUps.filter(R.compose(R.eq(2), R.length)).map(function(pair) {
+    var ignoreDigits;
+    ignoreDigits = function(string) {
+      return string.replace(/\d/, "");
+    };
+    match = R.compose(R.apply(R.eq), R.map(ignoreDigits))(pair);
+    return {
+      affectedCards: pair,
+      match: match
+    };
+  });
+  reset = match.flatMap(function(pair) {
+    if (pair.match) {
+      return Kefir.later(500, pair);
+    } else {
+      return Kefir.later(1500, pair);
+    }
+  });
+  getCardStream = function(card) {
+    var faceUpToAction, resetToAction;
+    faceUpToAction = function(faceUps) {
+      return {
+        affectedCards: [R.last(faceUps)],
+        status: cards.CARD_STATES.FACE_UP
+      };
+    };
+    resetToAction = function(reset) {
+      return {
+        affectedCards: reset.affectedCards,
+        status: reset.match ? cards.CARD_STATES.MATCHED : cards.CARD_STATES.FACE_DOWN
+      };
+    };
+    return Kefir.merge([faceUps.map(faceUpToAction), reset.map(resetToAction)]).filter(R.compose(R.contains(card.id), R.prop("affectedCards"))).scan(function(card, action) {
+      return R.merge(card, {
+        status: action.status
+      });
+    }, card);
+  };
+  cardStreams = Kefir.merge(R.map(getCardStream, deck));
+  updateTable = function(card) {
+    if (card.status === cards.CARD_STATES.FACE_UP) {
+      $cards[card.id].removeClass("face-down");
+      return $cards[card.id].addClass("face-up selected");
+    } else if (card.status === cards.CARD_STATES.FACE_DOWN) {
+      $cards[card.id].removeClass("face-up selected");
+      return $cards[card.id].addClass("face-down");
+    } else if (card.status === cards.CARD_STATES.MATCHED) {
+      return $cards[card.id].addClass("matched");
+    }
+  };
+  cardStreams.onValue(updateTable);
+  completedCards = match.filter(R.prop("match")).scan(function(matchesSoFar, _arg) {
+    var affectedCards;
+    affectedCards = _arg.affectedCards;
+    return R.concat(affectedCards, matchesSoFar);
+  }, []);
+  return finish = completedCards.filter(R.compose(R.eq(deck.length), R.length)).take(1).delay(2000).onValue(function() {
+    return cardStreams.offValue(updateTable);
+  }).map(function(completedCards) {
+    return ["youWin", completedCards];
+  });
+};
+
+});
+
+require.register("src/states/preload", function(exports, require, module) {
+var drawing;
+
+drawing = require("../drawing");
+
+module.exports = function(availableImages) {
+  var loadAssets, loader, toImagePath;
+  drawing.renderMessage("Loading...");
+  loader = new PxLoader();
+  toImagePath = function(image) {
+    return "assets/" + image + ".jpg";
+  };
+  loadAssets = R.forEach(R.compose(loader.addImage.bind(loader), toImagePath));
+  loadAssets(availableImages);
+  loader.addImage("assets/grammy.jpg");
+  loader.start();
+  return Kefir.fromCallback(loader.addCompletionListener).take(1).map(function() {
+    return ["assetsReady"];
+  }).onValue(function() {
+    return drawing.clearTable();
+  });
+};
+
+});
+
+require.register("src/states/select", function(exports, require, module) {
+var cards, drawing,
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+cards = require("../cards");
+
+drawing = require("../drawing");
+
+module.exports = function(availableImages, numberOfCardsInPlay) {
+  var $cards, cardClicks, deck, finished, highlight, makeClickStreams, selectedCards;
+  deck = cards.getCards(availableImages);
+  $cards = drawing.renderDeck(deck);
+  drawing.renderMessage("Pick " + numberOfCardsInPlay + " cards to play with:");
+  drawing.setMode("select");
+  highlight = function(selected) {
+    var card, _i, _len, _results;
+    _results = [];
+    for (_i = 0, _len = selected.length; _i < _len; _i++) {
+      card = selected[_i];
+      _results.push($cards[card].addClass("selected"));
+    }
+    return _results;
+  };
+  makeClickStreams = R.pipe(R.toPairs, R.map(function(elem) {
+    var $card, id;
+    id = elem[0];
+    $card = elem[1];
+    return Kefir.fromEvents($card, "click", R.always(id));
+  }));
+  cardClicks = makeClickStreams($cards);
+  selectedCards = Kefir.merge(cardClicks).scan(function(prev, next) {
+    if (__indexOf.call(prev, next) >= 0) {
+      return prev;
+    } else {
+      return R.append(next, prev);
+    }
+  }, []).onValue(highlight);
+  return finished = selectedCards.skipWhile(R.compose(R.gt(numberOfCardsInPlay), R.length)).take(1).delay(1000).map(function(selectedCards) {
+    return ["play", selectedCards];
+  }).onValue(function() {
+    selectedCards.offValue(highlight);
+    return drawing.clearTable();
+  });
+};
+
+});
+
+require.register("src/states/start", function(exports, require, module) {
+var drawing, startTemplate;
+
+drawing = require("../drawing");
+
+startTemplate = require("../templates/start");
+
+module.exports = function() {
+  var fourPairs, threePairs, twoPairs;
+  drawing.setMode("start");
+  drawing.renderContent(startTemplate);
+  twoPairs = Kefir.fromEvents($('#two-pairs'), 'click').map(function() {
+    return 2;
+  });
+  threePairs = Kefir.fromEvents($('#three-pairs'), 'click').map(function() {
+    return 3;
+  });
+  fourPairs = Kefir.fromEvents($('#four-pairs'), 'click').map(function() {
+    return 4;
+  });
+  return Kefir.merge([twoPairs, threePairs, fourPairs]).take(1).map(function(numberOfPairs) {
+    return ["begin", numberOfPairs];
+  }).onValue(function() {
+    return drawing.clearTable();
+  });
+};
+
+});
+
+require.register("src/templates/start", function(exports, require, module) {
+var __templateData = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+  return "<h1 id=\"title\">Grammy Cards</h1>\n<h2 id=\"subtitle\">\"A memory development game for early childhood\"</h2>\n<div id=\"title-page-card\" class=\"card face-down\"></div>\n<div id=\"select-mode\">\n  <div class=\"button\" id=\"two-pairs\">- Play with 2 pairs</div>\n  <div class=\"button\" id=\"three-pairs\">- Play with 3 pairs</div>\n  <div class=\"button\" id=\"four-pairs\">- Play with 4 pairs</div>\n</div>\n";
+  },"useData":true});
+if (typeof define === 'function' && define.amd) {
+  define([], function() {
+    return __templateData;
+  });
+} else if (typeof module === 'object' && module && module.exports) {
+  module.exports = __templateData;
+} else {
+  __templateData;
+}
+});
+
+;require.register("src/templates/win", function(exports, require, module) {
+var __templateData = Handlebars.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
+  return "<h1 id=\"title\">Yay!! You Win!</h1>\n<div id=\"end-page-card\" class=\"card face-down\"></div>\n<div id=\"play-again\" class=\"button\">Play again</div>\n";
+  },"useData":true});
+if (typeof define === 'function' && define.amd) {
+  define([], function() {
+    return __templateData;
+  });
+} else if (typeof module === 'object' && module && module.exports) {
+  module.exports = __templateData;
+} else {
+  __templateData;
+}
+});
+
+;
