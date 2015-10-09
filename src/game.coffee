@@ -1,9 +1,21 @@
 cards = require "./cards"
 frpfsm = require("../src/fsm");
 preloadGameState = require "./states/preload"
+startGameState = require "./states/start"
 selectGameState = require "./states/select"
 playGameState = require "./states/play"
 endGameState = require "./states/end"
+
+availableCards = [
+  "bath"
+  "dressing-up"
+  "ice-cream"
+  "painting"
+  "park"
+  "reading"
+  "camping"
+  "candy"
+]
 
 # on document ready
 Zepto ->
@@ -12,36 +24,34 @@ Zepto ->
 
   frpfsm.loadState
     name: "Preload"
-    state: preloadGameState
+    fn: preloadGameState
     transitions:
-      "assetsReady": selectGameState
+      "assetsReady": "Start"
+
+  frpfsm.loadState
+    name: "Start"
+    fn: startGameState
+    transitions:
+      "begin": "Select"
 
   frpfsm.loadState
     name: "Select"
-    state: selectGameState
+    fn: selectGameState.bind null, availableCards
     transitions:
-      "play": playGameState
+      "play": "Play"
 
   frpfsm.loadState
     name: "Play"
-    state: playGameState
+    fn: playGameState
     transitions:
-      "youWin": endGameState
+      "youWin": "End"
 
   frpfsm.loadState
     name: "End"
-    state: endGameState
+    fn: endGameState
     transitions:
-      "startOver": selectGameState
+      "startOver": "Start"
 
-
-  availableCards = [
-    "bath"
-    "dressing-up"
-    "ice-cream"
-    "painting"
-    "park"
-    "reading"
-  ]
+  # start!
   debug = true;
-  currentState = frpfsm.start(preloadGameState, availableCards, debug)
+  currentState = frpfsm.start("Preload", availableCards, debug)

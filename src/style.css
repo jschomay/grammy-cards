@@ -5,13 +5,95 @@
 body {
   margin: 0;
   padding: 0;
+  font-family: 'Schoolbell', cursive;
 }
+
+#load-font {
+  visibility: hidden;
+}
+
+#title {
+  text-align: center;
+  font-size: 90px;
+  color: white;
+  padding: 0px;
+  margin: 30px;
+}
+
+#subtitle {
+  text-align: center;
+  font-size: 40px;
+  color: wheat;
+  padding: 0px;
+  margin: 30px;
+}
+
+#title-page-card {
+  width: 290px;
+  height: 440px;
+  transform: rotate(-6deg);
+}
+#select-mode {
+  padding: 70px;
+  float: left;
+}
+
+.button {
+  margin-bottom: 30px;
+  font-size: 40px;
+  cursor: pointer;
+  background-color: white;
+  border: 1px solid;
+  padding: 5px 22px;
+  border-radius: 7px;
+}
+
+#select-mode #two-pairs {
+  color: #17CA17;
+}
+
+#select-mode #three-pairs {
+  color: #F72E53;
+}
+
+#select-mode #four-pairs {
+  color: #D049EF;
+}
+
+.end #content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#end-page-card {
+  width: 400px;
+  height: 530px;
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  bottom: -550px;
+  transition: bottom 4s;
+  animation: wiggle 0.4s ease-in-out 0ms infinite;
+}
+
+#end-page-card.appear {
+  bottom: -70px;
+}
+
+#play-again {
+  color: #1E8BDA;
+  padding: 5px 22px;
+}
+
 
 #message {
   text-align: center;
   font-size: 46px;
+  color: white;
   padding: 0px;
-  margin: 30px;
+  margin: 25px;
 }
 
 #game {
@@ -20,8 +102,18 @@ body {
   width: 1024px;
   height: 768px;
   margin: auto;
+  position: relative;
+  overflow: hidden;
 }
 
+.two-pairs #cards {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.three-pairs #cards .card {
+  margin: 33px 67px;
+}
 
 .card {
   width: 142px;

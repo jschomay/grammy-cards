@@ -5,7 +5,12 @@ module.exports = (selectedCards) ->
 
   deck = cards.getDeck selectedCards
 
-  drawing.setMode "play"
+  numPairs = switch selectedCards.length
+    when 2 then "two"
+    when 3 then "three"
+    when 4 then "four"
+
+  drawing.setMode "play #{numPairs}-pairs"
 
   $cards = drawing.renderDeck deck
 
@@ -55,7 +60,12 @@ module.exports = (selectedCards) ->
       affectedCards: pair
       match: match
 
-  reset = match.delay(1500)
+  reset = match.flatMap (pair) ->
+    if pair.match
+      return Kefir.later 500, pair
+    else
+      return Kefir.later 1500, pair
+
 
   # card values respond a follows:
   # - on faceUp go to face up
@@ -107,8 +117,7 @@ module.exports = (selectedCards) ->
   finish = completedCards
     .filter R.compose(R.eq(deck.length), R.length)
     .take 1
-    .delay 3000
+    .delay 2000
     .onValue ->
       cardStreams.offValue updateTable
-      drawing.clearTable()
     .map (completedCards) -> ["youWin", completedCards]
